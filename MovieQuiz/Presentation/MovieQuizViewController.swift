@@ -3,31 +3,29 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet var counterLabel: UILabel!
+    
+    private var currentQuestionIndex = 0
+    private var correctAnswersCount = 0
+    private var correctAnswers = 0
+    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = true
-        
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
         let givenAnswer = false
-        
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
-
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
-    
-    private var currentQuestionIndex = 0
-    private var correctAnswersCount = 0
-    private var correctAnswers = 0
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        resetFrame()
         let firstQuestion = questions[currentQuestionIndex]
         let viewModel = convert(model: firstQuestion)
         show(quiz: viewModel)
@@ -52,6 +50,13 @@ final class MovieQuizViewController: UIViewController {
         let questionNumber: String
     }
     
+    private func resetFrame() {
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.cornerRadius = 20
+        imageView.layer.borderColor = UIColor.clear.cgColor
+    }
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -61,19 +66,17 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func show(quiz step: QuizStepViewModel) {
-        imageView.layer.borderColor = UIColor.ypBlack.cgColor
+        resetFrame()
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
     
     private func showAnswerResult(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        imageView.layer.cornerRadius = 20
-        if isCorrect { // 1
-            correctAnswers += 1 // 2
+        
+        if isCorrect {
+            correctAnswers += 1
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
            self.showNextQuestionOrResults()
@@ -115,8 +118,6 @@ final class MovieQuizViewController: UIViewController {
             show(quiz: viewModel)
             }
         }
-
-   
 
     private let questions: [QuizQuestion] = [
         QuizQuestion(
@@ -170,5 +171,3 @@ final class MovieQuizViewController: UIViewController {
             correctAnswer: false)
     ]
 }
-
-

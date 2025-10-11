@@ -117,9 +117,9 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="counterLabel" destination="Aoc-iG-Hfx" id="XX2-C2-LOd"/>
-                        <outlet property="imageView" destination="B95-n8-SCb" id="Tbr-dG-IXT"/>
-                        <outlet property="textLabel" destination="K0U-i3-JdY" id="N1E-in-T4i"/>
+                        <outlet property="counterLabel" destination="Aoc-iG-Hfx" id="8mN-ce-K4G"/>
+                        <outlet property="imageView" destination="B95-n8-SCb" id="Gui-tT-Yl1"/>
+                        <outlet property="textLabel" destination="K0U-i3-JdY" id="BPz-V8-Fsp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
