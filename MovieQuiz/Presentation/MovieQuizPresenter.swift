@@ -1,28 +1,25 @@
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
+    private let statisticService: StatisticServiceProtocol!
     private var questionFactory: QuestionFactoryProtocol?
     private weak var viewController: MovieQuizViewController?
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
         
+        statisticService = StatisticService()
+        
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
         viewController.showLoadingIndicator()
     }
     
+    private var currentQuestion: QuizQuestion?
     private var currentQuestionIndex = 0
-    let questionsAmount: Int = 10
-    
-    var currentQuestion: QuizQuestion?
-    //weak var viewController: MovieQuizViewController?
-    
-    //var questionFactory: QuestionFactoryProtocol?
-    var correctAnswers = 0
-    private var correctAnswersCount = 0
-    
-    var statisticService: StatisticServiceProtocol!
+    private let questionsAmount: Int = 10
+    private var correctAnswers = 0
+    //private var correctAnswersCount = 0
     
     // MARK: - QuestionFactoryDelegate
     
@@ -47,11 +44,24 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.showNetworkError(message: message)
     }
     
-    
-    
+    // MARK: -
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
+    }
+    
+    func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        let givenAnswer = isYes
+        self.proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    func didAnswerCorrect(isCorrect: Bool) {
+        if isCorrect {
+            correctAnswers += 1
+        }
     }
     
     func restartGame() {
@@ -59,6 +69,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
     }
+    
     func switchToNextQuestion() {
         currentQuestionIndex += 1
     }
@@ -70,13 +81,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
-    // MARK: -
+    private func proceedWithAnswer(isCorrect: Bool) {
+        didAnswerCorrect(isCorrect: isCorrect)
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.proceedToNextQuestionOrResults()
+        }
+    }
     
-    
-    
-    
-    
-    func showNextQuestionOrResults() {
+    func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
             statisticService.store(correct: correctAnswers, total: self.questionsAmount)
             let bestGame = statisticService.bestGame
@@ -99,7 +114,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             }
         }
     
-    // MARK: - Actions
+    // MARK: - Buttons
     
     @IBAction func yesButtonClicked() {
         didAnswer(isYes: true)
@@ -107,18 +122,5 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     @IBAction func noButtonClicked() {
         didAnswer(isYes: false)
-    }
-    
-    func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = isYes
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    func didAnswerCorrect(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-        }
     }
 }

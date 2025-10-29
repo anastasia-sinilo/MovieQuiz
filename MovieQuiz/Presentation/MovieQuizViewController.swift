@@ -26,11 +26,8 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         resetFrame()
-        
         imageView.layer.cornerRadius = 20
-        statisticService = StatisticService()
         presenter = MovieQuizPresenter(viewController: self)
-        presenter.statisticService = statisticService
     }
     
     // MARK: - Private functions
@@ -60,15 +57,9 @@ final class MovieQuizViewController: UIViewController {
         alertPresenter.show(in: self, model: model)
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        presenter.didAnswerCorrect(isCorrect: isCorrect)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.presenter.showNextQuestionOrResults()
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+            imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         }
-    }
     
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
