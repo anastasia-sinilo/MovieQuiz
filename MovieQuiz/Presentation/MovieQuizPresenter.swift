@@ -3,9 +3,9 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private let statisticService: StatisticServiceProtocol!
     private var questionFactory: QuestionFactoryProtocol?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         statisticService = StatisticService()
